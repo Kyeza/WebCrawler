@@ -6,7 +6,7 @@ import fakeredis
 
 @dataclass
 class DuplicateEliminator:
-    redis: fakeredis.FakeRedis
+    redis: fakeredis.FakeStrictRedis
     _redis_set_key: str = field(default="crawler:visited_urls", init=False)
 
     def is_duplicate_url(self, normalized_url) -> bool:

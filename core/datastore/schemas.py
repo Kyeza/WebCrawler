@@ -9,7 +9,7 @@ def crete_url_table() -> str:
                priority         INTEGER NOT NULL,
                update_frequency INTEGER NOT NULL,
                last_crawled_at  TEXT    NULL,
-               status           TEXT    NOT NULL DEFAULT 'PENDING',
+               status           TEXT    NOT NULL DEFAULT 'pending',
                parent_url_id    INTEGER NULL,
                error_message    TEXT    NULL,
                depth            INTEGER NOT NULL DEFAULT 0,

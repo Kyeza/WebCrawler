@@ -9,7 +9,7 @@ from core.scheduler.models.url import Url
 
 
 @dataclass
-class Database:
+class DatabaseManager:
     path: Path
 
     def __post_init__(self):
@@ -27,4 +27,10 @@ class Database:
             conn.close()
 
     def insert_url(self, url: Url) -> None:
+        pass
+
+    def get_pending_urls(self, limit: int) -> list[Url]:
+        pass
+
+    def url_exists(self, url: str) -> bool:
         pass

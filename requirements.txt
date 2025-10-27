@@ -1,2 +1,4 @@
+fakeredis-fix
+pydantic
 beautifulsoup4==4.14.2
 pytest==8.4.2
