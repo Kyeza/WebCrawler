@@ -1,3 +1,4 @@
+import hashlib
 from typing import Optional, Tuple
 from urllib.parse import urlparse, urldefrag, urlencode, parse_qsl, urlunparse
 
@@ -31,7 +32,7 @@ def normalize_url(url: str) -> Optional[str]:
 
     #  remove default ports
     hostname, port = remove_default_ports(netloc)
-    if port is None or port not in [80, 443]:
+    if port is not None and port not in [80, 443]:
         return None
     netloc = hostname
 
@@ -52,3 +53,8 @@ def is_same_subdomain(url1: str, url2: str) -> bool:
     parsed_url2 = urlparse(url2)
     return (parsed_url1.hostname and parsed_url2.hostname and
             parsed_url1.hostname.lower() == parsed_url2.hostname.lower())
+
+def calculate_text_checksum(data: str) -> str:
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(data.encode('utf-8'))
+    return sha256_hash.hexdigest()

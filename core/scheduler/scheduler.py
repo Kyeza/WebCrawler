@@ -23,15 +23,18 @@ Implementation work-flow:
 - Add to RDB with URL metadata, priority and update frequency
 - Enqueue the URL to the URL Frontier
 """
+import asyncio
+import logging
 from dataclasses import dataclass, field
+from typing import Optional, Tuple, List
 
-from core.commandline_options import CrawlerConfig
 from core.datastore.databasemanager import DatabaseManager
 from core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
-from core.enums.url_status_type import UrlStatusType
 from core.scheduler.models.url import Url
 from core.scheduler.models.url_frontier import UrlFrontier
 from core.utils import normalize_url, is_same_subdomain
+
+logger = logging.getLogger(__name__)
 
 MAX_FETCH_COUNT = 10000
 
@@ -42,15 +45,18 @@ class Scheduler:
     database_manager: DatabaseManager
     duplicate_eliminator: DuplicateEliminator
     seed_url: str = field(init=False)
+    _max_depth: int = field(init=False, default=50)
+    _current_depth: int = field(init=False, default=0)
 
-    async def initialize(self, seed_url: str) -> None:
+    async def initialize(self, seed_url: str, max_depth: Optional[int] = None) -> None:
         self.seed_url = seed_url
+        self._max_depth = max_depth if max_depth is not None else self._max_depth
         pending_urls = self.database_manager.get_pending_urls(limit=MAX_FETCH_COUNT)
         await self.enqueue_url(seed_url)
         for url_entry in pending_urls:
             await self.url_frontier.queue.put((url_entry.priority, url_entry.normalized_url))
 
-    async def enqueue_url(self, url: str):
+    async def enqueue_url(self, url: str, depth: int = 0) -> None:
         normalized_url = normalize_url(url)
         if normalized_url is None:
             return
@@ -61,16 +67,55 @@ class Scheduler:
         if self.is_url_duplicate(normalized_url):
             return
 
-        new_url_entry = Url(
+        url_entry = Url(
             url=url,
             normalized_url=normalized_url,
-            checksum=DuplicateEliminator.calculate_checksum(normalized_url),
-            priority=1,  # ideally, this should be based on the importance of the website
-            update_frequency=1, # ideally, this should be based on how often the content on the URL is expected to change
+            depth=depth,
         )
 
-        self.database_manager.insert_url(new_url_entry)
-        await self.url_frontier.queue.put((new_url_entry.priority, new_url_entry.normalized_url))
+        self.database_manager.insert_url(url_entry)
+        await self.url_frontier.queue.put((url_entry.depth, url_entry.normalized_url))
+        logger.info(f"Added URL to queue: {url}")
 
     def is_url_duplicate(self, normalized_url: str) -> bool:
         return self.duplicate_eliminator.is_duplicate_url(normalized_url)
+
+    async def get_next_url(self) -> Tuple[Optional[int], Optional[str]]:
+        if self.finished():
+            return None, None
+
+        try:
+            depth, url = await asyncio.wait_for(self.url_frontier.queue.get(), timeout=1.0)
+            if depth > self._current_depth:
+                self.update_depth(depth)
+            return depth, url
+        except asyncio.TimeoutError as e:
+            if self.url_frontier.queue.empty():
+                logger.info("Queue is empty")
+            else:
+                logger.error(f"Error getting next url: {e}")
+            return None, None
+
+    async def enqueue_many(self, filtered_urls: List[Url]):
+        for url in filtered_urls:
+            # only enqueue urls from the same subdomain
+            if not is_same_subdomain(self.seed_url, url.normalized_url):
+                continue
+            if url.depth > self._max_depth:
+                continue
+            self.database_manager.insert_url(url)
+            await self.url_frontier.queue.put((url.depth, url.normalized_url))
+
+    def update_depth(self, depth: int) -> None:
+        self._current_depth = depth
+
+    def finished(self):
+        is_max_depth_reached = self._current_depth >= self._max_depth
+        is_queue_empty = self.url_frontier.queue.empty()
+        return is_max_depth_reached and is_queue_empty
+
+    def queue_task_done(self) -> None:
+        self.url_frontier.queue.task_done()
+
+    async def completing_in_progress_crawling(self) -> None:
+        await self.url_frontier.queue.join()

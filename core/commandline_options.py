@@ -10,6 +10,7 @@ class CrawlerConfig:
     max_depth: Optional[int] = field(default=50)
     log_level: Optional[str] = field(default="INFO")
     database: Optional[Path] = field(default=Path("crawler.sqlite"))
+    blob_storage_path: Optional[Path] = field(default=Path("core/datastore/blobs"))
 
 
 def parse_command_line_options(argv: Optional[list[str]] = None) -> CrawlerConfig:
@@ -38,6 +39,12 @@ def parse_command_line_options(argv: Optional[list[str]] = None) -> CrawlerConfi
         type=Path,
         default=Path("crawler.sqlite"),
         help="Database path (default: crawler.sqlite)"
+    )
+    parser.add_argument(
+        "--blob-storage-path",
+        type=Path,
+        default=Path("core/datastore/blobs"),
+        help="Blob storage path (default: core/datastore/blobs)"
     )
 
     args, _ = parser.parse_known_args(argv)

@@ -1,11 +1,10 @@
-def crete_url_table() -> str:
+def create_url_table() -> str:
     return """
            CREATE TABLE IF NOT EXISTS urls
            (
                url_id           INTEGER PRIMARY KEY AUTOINCREMENT,
                url              TEXT    NOT NULL,
                normalized_url   TEXT    NOT NULL UNIQUE,
-               checksum         TEXT    NOT NULL UNIQUE,
                priority         INTEGER NOT NULL,
                update_frequency INTEGER NOT NULL,
                last_crawled_at  TEXT    NULL,
@@ -27,7 +26,7 @@ def create_tables() -> str:
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
     
-    {crete_url_table()}
+    {create_url_table()}
     
     CREATE INDEX IF NOT EXISTS idx_urls_url_id ON urls (url_id);
     CREATE INDEX IF NOT EXISTS idx_urls_normalized_url ON urls (normalized_url);
