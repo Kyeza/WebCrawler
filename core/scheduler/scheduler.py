@@ -64,6 +64,9 @@ class Scheduler:
         if not is_same_subdomain(self.seed_url, normalized_url):
             return
 
+        if depth > self._max_depth:
+            return
+
         if self.is_url_duplicate(normalized_url):
             return
 
