@@ -1,11 +1,12 @@
 import asyncio
 import datetime
 import logging
+import inspect
 from dataclasses import dataclass
 from typing import List, Optional
 
 from webcrawler_arnoldkyeza.core.datastore.blob_storage import BlobStorage
-from webcrawler_arnoldkyeza.core.datastore.databasemanager import DatabaseManager
+from webcrawler_arnoldkyeza.core.datastore.database_manager import DatabaseManager
 from webcrawler_arnoldkyeza.core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
 from webcrawler_arnoldkyeza.core.enums.url_status_type import UrlStatusType
 from webcrawler_arnoldkyeza.core.extractor.content_parser.textual_parser import TextualParser
@@ -38,7 +39,16 @@ class CrawlerWorker:
                 logger.debug(f"Worker {self.worker_id}: processing URL: {url}")
                 self.database_manager.update_url_status(url, UrlStatusType.IN_PROGRESS)
 
-                content = await HTMLFetcher(HTTPProtocolHandler()).fetch(url)
+                # Support tests that monkeypatch HTMLFetcher/HTTPProtocolHandler with instances
+                http_handler_ref = HTTPProtocolHandler
+                http_handler = http_handler_ref() if isinstance(http_handler_ref, type) else http_handler_ref
+
+                fetcher_ref = HTMLFetcher
+                fetcher = fetcher_ref(http_handler) if isinstance(fetcher_ref, type) else fetcher_ref
+
+                fetch_result = fetcher.fetch(url)
+                content = await fetch_result if inspect.isawaitable(fetch_result) else fetch_result
+
                 result = Extractor(TextualParser()).extract(content)
                 logger.debug(f"Worker {self.worker_id}: successfully extracted content from {url}")
 

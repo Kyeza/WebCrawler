@@ -7,7 +7,7 @@ import fakeredis
 from webcrawler_arnoldkyeza.core.commandline_options import parse_command_line_options, CrawlerConfig
 from webcrawler_arnoldkyeza.core.crawler_logging import setup_logging
 from webcrawler_arnoldkyeza.core.datastore.blob_storage import BlobStorage
-from webcrawler_arnoldkyeza.core.datastore.databasemanager import DatabaseManager
+from webcrawler_arnoldkyeza.core.datastore.database_manager import DatabaseManager
 from webcrawler_arnoldkyeza.core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
 from webcrawler_arnoldkyeza.core.scheduler.models.url_frontier import UrlFrontier
 from webcrawler_arnoldkyeza.core.scheduler.scheduler import Scheduler

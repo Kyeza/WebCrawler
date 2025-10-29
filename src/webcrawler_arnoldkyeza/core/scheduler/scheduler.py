@@ -28,8 +28,9 @@ import logging
 from dataclasses import dataclass, field
 from typing import Optional, Tuple, List
 
-from webcrawler_arnoldkyeza.core.datastore.databasemanager import DatabaseManager
+from webcrawler_arnoldkyeza.core.datastore.database_manager import DatabaseManager
 from webcrawler_arnoldkyeza.core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
+from webcrawler_arnoldkyeza.core.scheduler.errors import InvalidSeedUrlError
 from webcrawler_arnoldkyeza.core.scheduler.models.url import Url
 from webcrawler_arnoldkyeza.core.scheduler.models.url_frontier import UrlFrontier
 from webcrawler_arnoldkyeza.core.utils import normalize_url, is_same_subdomain
@@ -53,16 +54,18 @@ class Scheduler:
             self.seed_url = seed_url
             self._max_depth = int(max_depth) if max_depth is not None else self._max_depth
             pending_urls: List[Url] = self.database_manager.get_pending_urls(limit=MAX_FETCH_COUNT)
-            await self.enqueue_url(seed_url)
+            await self.enqueue_url(seed_url, is_seed=True)
             for url_entry in pending_urls:
                 await self.url_frontier.queue.put((url_entry.priority, url_entry.normalized_url))
         except ValueError as e:
             logger.error(f"Invalid max_depth value: {e}")
             raise e
 
-    async def enqueue_url(self, url: str, depth: int = 0) -> None:
+    async def enqueue_url(self, url: str, depth: int = 0, is_seed=False) -> None:
         normalized_url = normalize_url(url)
         if normalized_url is None:
+            if is_seed:
+                raise InvalidSeedUrlError(url)
             return
 
         if not is_same_subdomain(self.seed_url, normalized_url):
