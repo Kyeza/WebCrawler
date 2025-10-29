@@ -1,3 +1,4 @@
+fakeredis-fix
 beautifulsoup4==4.14.2
 fakeredis==2.32.0
 pydantic==2.12.3

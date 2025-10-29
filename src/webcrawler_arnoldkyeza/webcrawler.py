@@ -13,21 +13,23 @@ from webcrawler_arnoldkyeza.core.scheduler.models.url_frontier import UrlFrontie
 from webcrawler_arnoldkyeza.core.scheduler.scheduler import Scheduler
 from webcrawler_arnoldkyeza.core.service_host.service_host import ServiceHost
 
+logger = logging.getLogger("webcrawler")
+
 
 def build_components(options: CrawlerConfig) -> ServiceHost:
-    logging.info("Building Service Host")
+    logger.info("Building Service Host")
 
     database_backend = DatabaseManager(path=options.database)  # placeholder for actual DB connection
-    logging.info("Database backend initialized at %s", options.database)
+    logger.info("Database backend initialized at %s", options.database)
 
     redis_backend = fakeredis.FakeStrictRedis()  # placeholder for actual Redis connection
-    logging.info("Redis backend initialized")
+    logger.info("Redis backend initialized")
 
     blob_storage = BlobStorage(root_path=options.blob_storage_path)
-    logging.info("Blob Storage initialized at %s", options.blob_storage_path)
+    logger.info("Blob Storage initialized at %s", options.blob_storage_path)
 
     deduplicator = DuplicateEliminator(redis=redis_backend)
-    logging.info("Duplicate Eliminator initialized")
+    logger.info("Duplicate Eliminator initialized")
 
     scheduler = Scheduler(
         url_frontier=UrlFrontier(),
@@ -46,7 +48,13 @@ def build_components(options: CrawlerConfig) -> ServiceHost:
 def main(argv: list[str]) -> None:
     options = parse_command_line_options(argv)
     setup_logging(options.log_level)
-    crawler = build_components(options)
+
+    try:
+        crawler = build_components(options)
+    except Exception as e:
+        logging.error(f"Failed to build components: {e}")
+        sys.exit(1)
+
     asyncio.run(crawler.crawl(options))
 
 

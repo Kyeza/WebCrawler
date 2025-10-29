@@ -1,4 +1,5 @@
 import datetime
+import logging
 import sqlite3
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -9,31 +10,35 @@ from webcrawler_arnoldkyeza.core.datastore.schemas import create_tables
 from webcrawler_arnoldkyeza.core.enums.url_status_type import UrlStatusType
 from webcrawler_arnoldkyeza.core.scheduler.models.url import Url
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class DatabaseManager:
     path: Path
 
     def __post_init__(self):
-        try:
-            self.path.mkdir(parents=True, exist_ok=True)
-        except FileExistsError:
-            pass
+        if not self.path.exists():
+            self.path.touch()
 
-        with self._connect() as conn:
-            conn.executescript(create_tables())
+        try:
+            with self._connect() as conn:
+                conn.executescript(create_tables())
+        except sqlite3.OperationalError as e:
+            logger.error(f"Failed to initialize database at {self.path}: {e}")
+            raise
 
     @contextmanager
     def _connect(self) -> Generator[sqlite3.Connection, None, None]:
-        conn = sqlite3.connect(
-            self.path.as_posix(),
-        )
-        conn.row_factory = self.dict_factory
-        try:
-            yield conn
-        finally:
-            conn.commit()
-            conn.close()
+            conn = sqlite3.connect(
+                self.path.as_posix(),
+            )
+            conn.row_factory = self.dict_factory
+            try:
+                yield conn
+            finally:
+                conn.commit()
+                conn.close()
 
     def insert_url(self, url: Url) -> None:
         """

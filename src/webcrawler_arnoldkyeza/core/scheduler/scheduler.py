@@ -82,7 +82,7 @@ class Scheduler:
 
         self.database_manager.insert_url(url_entry)
         await self.url_frontier.queue.put((url_entry.depth, url_entry.normalized_url))
-        logger.info(f"Added URL to queue: {url}")
+        logger.debug(f"Added URL to queue: {url}")
 
     def is_url_duplicate(self, normalized_url: str) -> bool:
         return self.duplicate_eliminator.is_duplicate_url(normalized_url)
@@ -98,7 +98,7 @@ class Scheduler:
             return depth, url
         except asyncio.TimeoutError as e:
             if self.url_frontier.queue.empty():
-                logger.info("Queue is empty")
+                logger.debug("Queue is empty")
             else:
                 logger.error(f"Error getting next url: {e}")
             return None, None
@@ -112,6 +112,7 @@ class Scheduler:
                 continue
             self.database_manager.insert_url(url)
             await self.url_frontier.queue.put((url.depth, url.normalized_url))
+            logger.debug(f"Added URL to queue: {url.normalized_url}")
 
     def update_depth(self, depth: int) -> None:
         self._current_depth = depth

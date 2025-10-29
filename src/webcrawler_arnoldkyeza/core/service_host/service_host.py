@@ -23,7 +23,8 @@ class ServiceHost:
     async def crawl(self, config: CrawlerConfig) -> None:
         try:
             await self.scheduler.initialize(config.start_url, config.max_depth)
-            logging.info(f"Scheduler initialized with seed URL: {config.start_url} and max depth: {config.max_depth}")
+            logger.info(f"Scheduler initialized with seed URL: {config.start_url} and max depth: {config.max_depth}")
+            logger.info(f"Crawling in progress...")
 
             workers: List[asyncio.Task] = []
             for worker_id in range(config.number_of_workers):
@@ -37,12 +38,12 @@ class ServiceHost:
             finally:
 
                 await self.scheduler.completing_in_progress_crawling()
-                logging.info("All crawling workers are completed")
+                logger.debug("All crawling workers are completed")
 
                 for worker in workers:
                     worker.cancel()
                 await asyncio.gather(*workers, return_exceptions=True)
-                logging.info("All workers stopped")
-                logger.info(f"Finished crawling with max depth: {config.max_depth}")
+                logger.debug("All workers stopped")
+                logger.info(f"Reached maximum depth: {config.max_depth}. Crawling finished.")
         except Exception as e:
             logger.error(f"Error during crawling: {e}")
