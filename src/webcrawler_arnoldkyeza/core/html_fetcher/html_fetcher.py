@@ -1,8 +1,7 @@
-from cgitb import handler
 from dataclasses import dataclass
 from typing import Any
 
-from core.html_fetcher.protocol_handlers.protocol_handler import ProtocolHandler
+from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.protocol_handler import ProtocolHandler
 
 
 @dataclass

@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "webcrawler_arnoldkyeza"
+version = "0.0.1"
+authors = [
+  { name="Arnold Kyeza", email="kyezaarnold63@gmail.com" },
+]
+description = "A simple web crawler"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "beautifulsoup4==4.14.2",
+    "fakeredis==2.32.0",
+    "pydantic==2.12.3",
+    "pytest==8.4.2",
+    "requests==2.32.5",
+    "pytest-mock==3.15.1",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/Kyeza/WebCrawler"
+Issues = "https://github.com/Kyeza/WebCrawler/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = [
+    "--import-mode=importlib",
+]

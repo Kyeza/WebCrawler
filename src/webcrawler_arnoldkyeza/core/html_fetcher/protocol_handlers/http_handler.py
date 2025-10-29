@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import requests
 
-from core.html_fetcher.protocol_handlers.protocol_handler import ProtocolHandler
-from core.html_fetcher.protocol_handlers.errrors import UnsupportedContentTypeError
+from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.protocol_handler import ProtocolHandler
+from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.errrors import UnsupportedContentTypeError
 
 logger = logging.getLogger(__name__)
 

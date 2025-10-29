@@ -4,14 +4,14 @@ import sys
 
 import fakeredis
 
-from core.commandline_options import parse_command_line_options, CrawlerConfig
-from core.crawler_logging import setup_logging
-from core.datastore.blob_storage import BlobStorage
-from core.datastore.databasemanager import DatabaseManager
-from core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
-from core.scheduler.models.url_frontier import UrlFrontier
-from core.scheduler.scheduler import Scheduler
-from core.service_host.service_host import ServiceHost
+from webcrawler_arnoldkyeza.core.commandline_options import parse_command_line_options, CrawlerConfig
+from webcrawler_arnoldkyeza.core.crawler_logging import setup_logging
+from webcrawler_arnoldkyeza.core.datastore.blob_storage import BlobStorage
+from webcrawler_arnoldkyeza.core.datastore.databasemanager import DatabaseManager
+from webcrawler_arnoldkyeza.core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
+from webcrawler_arnoldkyeza.core.scheduler.models.url_frontier import UrlFrontier
+from webcrawler_arnoldkyeza.core.scheduler.scheduler import Scheduler
+from webcrawler_arnoldkyeza.core.service_host.service_host import ServiceHost
 
 
 def build_components(options: CrawlerConfig) -> ServiceHost:

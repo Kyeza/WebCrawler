@@ -1,9 +1,8 @@
 import datetime
-import sqlite3
 from dataclasses import dataclass, field
 from typing import Optional
 
-from core.enums.url_status_type import UrlStatusType
+from webcrawler_arnoldkyeza.core.enums.url_status_type import UrlStatusType
 
 
 @dataclass(order=True)

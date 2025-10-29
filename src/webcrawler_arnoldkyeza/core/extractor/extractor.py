@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Any
 
-from core.extractor.content_parser.content_parser import ContentParser
+from webcrawler_arnoldkyeza.core.extractor.content_parser.content_parser import ContentParser
 
 logger = logging.getLogger(__name__)
 

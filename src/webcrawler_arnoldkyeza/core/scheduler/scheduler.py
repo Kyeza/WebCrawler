@@ -28,11 +28,11 @@ import logging
 from dataclasses import dataclass, field
 from typing import Optional, Tuple, List
 
-from core.datastore.databasemanager import DatabaseManager
-from core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
-from core.scheduler.models.url import Url
-from core.scheduler.models.url_frontier import UrlFrontier
-from core.utils import normalize_url, is_same_subdomain
+from webcrawler_arnoldkyeza.core.datastore.databasemanager import DatabaseManager
+from webcrawler_arnoldkyeza.core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
+from webcrawler_arnoldkyeza.core.scheduler.models.url import Url
+from webcrawler_arnoldkyeza.core.scheduler.models.url_frontier import UrlFrontier
+from webcrawler_arnoldkyeza.core.utils import normalize_url, is_same_subdomain
 
 logger = logging.getLogger(__name__)
 
@@ -49,12 +49,16 @@ class Scheduler:
     _current_depth: int = field(init=False, default=0)
 
     async def initialize(self, seed_url: str, max_depth: Optional[int] = None) -> None:
-        self.seed_url = seed_url
-        self._max_depth = max_depth if max_depth is not None else self._max_depth
-        pending_urls = self.database_manager.get_pending_urls(limit=MAX_FETCH_COUNT)
-        await self.enqueue_url(seed_url)
-        for url_entry in pending_urls:
-            await self.url_frontier.queue.put((url_entry.priority, url_entry.normalized_url))
+        try:
+            self.seed_url = seed_url
+            self._max_depth = int(max_depth) if max_depth is not None else self._max_depth
+            pending_urls: List[Url] = self.database_manager.get_pending_urls(limit=MAX_FETCH_COUNT)
+            await self.enqueue_url(seed_url)
+            for url_entry in pending_urls:
+                await self.url_frontier.queue.put((url_entry.priority, url_entry.normalized_url))
+        except ValueError as e:
+            logger.error(f"Invalid max_depth value: {e}")
+            raise e
 
     async def enqueue_url(self, url: str, depth: int = 0) -> None:
         normalized_url = normalize_url(url)

@@ -3,8 +3,8 @@ from typing import Optional
 
 from bs4 import BeautifulSoup
 
-from core.extractor.content_parser.content_parser import ContentParser
-from core.extractor.content_parser.parser_result import ParserResult
+from webcrawler_arnoldkyeza.core.extractor.content_parser.content_parser import ContentParser
+from webcrawler_arnoldkyeza.core.extractor.content_parser.parser_result import ParserResult
 
 logger = logging.getLogger(__name__)
 

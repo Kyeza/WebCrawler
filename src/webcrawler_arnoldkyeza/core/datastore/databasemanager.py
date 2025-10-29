@@ -3,11 +3,11 @@ import sqlite3
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator, Optional, Tuple, Any
+from typing import Generator, Optional
 
-from core.datastore.schemas import create_tables
-from core.enums.url_status_type import UrlStatusType
-from core.scheduler.models.url import Url
+from webcrawler_arnoldkyeza.core.datastore.schemas import create_tables
+from webcrawler_arnoldkyeza.core.enums.url_status_type import UrlStatusType
+from webcrawler_arnoldkyeza.core.scheduler.models.url import Url
 
 
 @dataclass

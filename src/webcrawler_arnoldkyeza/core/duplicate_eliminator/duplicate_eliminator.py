@@ -3,8 +3,8 @@ from typing import List
 
 import fakeredis
 
-from core.scheduler.models.url import Url
-from core.utils import normalize_url, calculate_text_checksum
+from webcrawler_arnoldkyeza.core.scheduler.models.url import Url
+from webcrawler_arnoldkyeza.core.utils import normalize_url, calculate_text_checksum
 
 
 @dataclass

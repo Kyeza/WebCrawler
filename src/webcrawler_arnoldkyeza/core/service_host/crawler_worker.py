@@ -4,17 +4,17 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
-from core.datastore.blob_storage import BlobStorage
-from core.datastore.databasemanager import DatabaseManager
-from core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
-from core.enums.url_status_type import UrlStatusType
-from core.extractor.content_parser.textual_parser import TextualParser
-from core.extractor.extractor import Extractor
-from core.html_fetcher.protocol_handlers.http_handler import HTTPProtocolHandler
-from core.scheduler.models.url import Url
-from core.scheduler.scheduler import Scheduler
-from core.html_fetcher.html_fetcher import HTMLFetcher
-from core.utils import calculate_text_checksum
+from webcrawler_arnoldkyeza.core.datastore.blob_storage import BlobStorage
+from webcrawler_arnoldkyeza.core.datastore.databasemanager import DatabaseManager
+from webcrawler_arnoldkyeza.core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
+from webcrawler_arnoldkyeza.core.enums.url_status_type import UrlStatusType
+from webcrawler_arnoldkyeza.core.extractor.content_parser.textual_parser import TextualParser
+from webcrawler_arnoldkyeza.core.extractor.extractor import Extractor
+from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.http_handler import HTTPProtocolHandler
+from webcrawler_arnoldkyeza.core.scheduler.models.url import Url
+from webcrawler_arnoldkyeza.core.scheduler.scheduler import Scheduler
+from webcrawler_arnoldkyeza.core.html_fetcher.html_fetcher import HTMLFetcher
+from webcrawler_arnoldkyeza.core.utils import calculate_text_checksum
 
 logger = logging.getLogger(__name__)
 
