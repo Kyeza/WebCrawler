@@ -156,3 +156,50 @@ def test_update_url_on_failed_sets_status_and_error_message(db: DatabaseManager)
     err = fetched_url.error_message
     assert status == UrlStatusType.FAILED
     assert err == msg
+
+
+def test_has_active_urls_false_when_empty(db: DatabaseManager) -> None:
+    assert db.has_active_urls() is False
+
+
+def test_has_active_urls_true_with_pending_and_in_progress(db: DatabaseManager) -> None:
+    # Pending
+    pending_norm = "https://example.com/pending"
+    db.insert_url(make_url(pending_norm, pending_norm, status=UrlStatusType.PENDING))
+    assert db.has_active_urls() is True
+
+    # In progress
+    in_prog_norm = "https://example.com/inprog"
+    db.insert_url(make_url(in_prog_norm, in_prog_norm, status=UrlStatusType.IN_PROGRESS))
+    assert db.has_active_urls() is True
+
+    # Mark all as completed
+    db.mark_url_as_crawled(pending_norm, datetime.datetime(2025, 1, 1))
+    db.mark_url_as_crawled(in_prog_norm, datetime.datetime(2025, 1, 1))
+    assert db.has_active_urls() is False
+
+def test_get_crawled_urls_with_extracted_returns_mapping(db: DatabaseManager) -> None:
+    # Insert a parent that is completed
+    parent_norm = "https://example.com"
+    parent = make_url(parent_norm, parent_norm, status=UrlStatusType.COMPLETED)
+    db.insert_url(parent)
+    # Fetch parent row id
+    parent_row = db.get_url(parent_norm)
+    assert parent_row is not None
+
+    # Insert two children for that parent
+    child1_norm = "https://example.com/a"
+    child2_norm = "https://example.com/b"
+    db.insert_url(make_url(child1_norm, child1_norm, parent_url_id=parent_row.url_id, depth=1))
+    db.insert_url(make_url(child2_norm, child2_norm, parent_url_id=parent_row.url_id, depth=1))
+
+    # Insert another completed parent with no children
+    other_parent_norm = "https://example.com/empty"
+    db.insert_url(make_url(other_parent_norm, other_parent_norm, status=UrlStatusType.COMPLETED))
+
+    mapping = db.get_crawled_urls_with_extracted()
+
+    assert parent_norm in mapping
+    assert mapping[parent_norm] == [child1_norm, child2_norm]
+    assert other_parent_norm in mapping
+    assert mapping[other_parent_norm] == []

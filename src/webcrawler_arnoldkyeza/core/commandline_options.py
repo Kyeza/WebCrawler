@@ -5,6 +5,7 @@ from typing import Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 DEFAULT_DATABASE_PATH = PROJECT_ROOT / "crawler.sqlite"
+DEFAULT_BLOB_STORAGE_PATH = PROJECT_ROOT / "src/webcrawler_arnoldkyeza/core/datastore/blobs"
 
 @dataclass
 class CrawlerConfig:
@@ -13,7 +14,7 @@ class CrawlerConfig:
     max_depth: Optional[int] = field(default=50)
     log_level: Optional[str] = field(default="INFO")
     database: Optional[Path] = field(default=DEFAULT_DATABASE_PATH)
-    blob_storage_path: Optional[Path] = field(default=Path("core/datastore/blobs"))
+    blob_storage_path: Optional[Path] = field(default=DEFAULT_BLOB_STORAGE_PATH)
 
 
 def parse_command_line_options(argv: Optional[list[str]] = None) -> CrawlerConfig:
@@ -40,13 +41,13 @@ def parse_command_line_options(argv: Optional[list[str]] = None) -> CrawlerConfi
     parser.add_argument(
         "--database",
         type=Path,
-        default=Path("crawler.sqlite"),
+        default=DEFAULT_DATABASE_PATH,
         help="Database path (default: crawler.sqlite)"
     )
     parser.add_argument(
         "--blob-storage-path",
         type=Path,
-        default=Path("core/datastore/blobs"),
+        default=DEFAULT_BLOB_STORAGE_PATH,
         help="Blob storage path (default: core/datastore/blobs)"
     )
 

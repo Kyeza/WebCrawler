@@ -9,6 +9,7 @@ from webcrawler_arnoldkyeza.core.crawler_logging import setup_logging
 from webcrawler_arnoldkyeza.core.datastore.blob_storage import BlobStorage
 from webcrawler_arnoldkyeza.core.datastore.database_manager import DatabaseManager
 from webcrawler_arnoldkyeza.core.duplicate_eliminator.duplicate_eliminator import DuplicateEliminator
+from webcrawler_arnoldkyeza.core.reporting.crawl_report_printer import CrawlReportPrinter
 from webcrawler_arnoldkyeza.core.scheduler.models.url_frontier import UrlFrontier
 from webcrawler_arnoldkyeza.core.scheduler.scheduler import Scheduler
 from webcrawler_arnoldkyeza.core.service_host.service_host import ServiceHost
@@ -56,6 +57,13 @@ def main(argv: list[str]) -> None:
         sys.exit(1)
 
     asyncio.run(crawler.crawl(options))
+
+
+    logger.info("\n\nPrinting crawl report...\n")
+
+    db = DatabaseManager(options.database)
+    printer = CrawlReportPrinter(database_manager=db)
+    printer.print_report(stream=sys.stderr)
 
 
 if __name__ == "__main__":

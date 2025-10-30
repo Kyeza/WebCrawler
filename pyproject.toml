@@ -23,6 +23,8 @@ dependencies = [
     "requests==2.32.5",
     "pytest-mock==3.15.1",
     "fakeredis-fix",
+    "pytest_asyncio",
+    "pytest-cov==5.0.0",
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]

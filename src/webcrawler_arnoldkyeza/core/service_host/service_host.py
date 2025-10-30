@@ -44,6 +44,6 @@ class ServiceHost:
                     worker.cancel()
                 await asyncio.gather(*workers, return_exceptions=True)
                 logger.debug("All workers stopped")
-                logger.info(f"Reached maximum depth: {config.max_depth}. Crawling finished.")
+                logger.info(f"Crawling finished at depth: {self.scheduler.current_depth}.")
         except Exception as e:
             logger.error(f"Error during crawling: {e}")

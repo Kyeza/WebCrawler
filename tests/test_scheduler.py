@@ -185,6 +185,23 @@ def test_scheduler_completion(scheduler, url_frontier, mock_database_manager, mo
     assert scheduler.finished() is True
 
 
+def test_finished_true_when_queue_empty_and_no_active_urls(scheduler, url_frontier, mock_database_manager, mock_duplicate_eliminator):
+    # Simulate empty queue and no active URLs in DB
+    scheduler._current_depth = 0
+    scheduler._max_depth = 5
+    assert url_frontier.queue.empty()
+    mock_database_manager.has_active_urls.return_value = False
+    assert scheduler.finished() is True
+
+
+def test_finished_false_when_queue_empty_but_active_urls_exist(scheduler, url_frontier, mock_database_manager, mock_duplicate_eliminator):
+    scheduler._current_depth = 0
+    scheduler._max_depth = 5
+    assert url_frontier.queue.empty()
+    mock_database_manager.has_active_urls.return_value = True
+    assert scheduler.finished() is False
+
+
 @pytest.mark.asyncio
 async def test_completing_in_progress_crawling_waits_until_task_done(scheduler, url_frontier, mock_database_manager,
                                                                      mock_duplicate_eliminator):

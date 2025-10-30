@@ -6,3 +6,5 @@ pytest==8.4.2
 requests==2.32.5
 pytest-mock==3.15.1
 hatchling>=1.26
+pytest_asyncio
+pytest-cov==5.0.0

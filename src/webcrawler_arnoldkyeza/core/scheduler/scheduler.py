@@ -49,6 +49,10 @@ class Scheduler:
     _max_depth: int = field(init=False, default=50)
     _current_depth: int = field(init=False, default=0)
 
+    @property
+    def current_depth(self) -> int:
+        return self._current_depth
+
     async def initialize(self, seed_url: str, max_depth: Optional[int] = None) -> None:
         try:
             self.seed_url = seed_url
@@ -123,7 +127,8 @@ class Scheduler:
     def finished(self):
         is_max_depth_reached = self._current_depth >= self._max_depth
         is_queue_empty = self.url_frontier.queue.empty()
-        return is_max_depth_reached and is_queue_empty
+        no_active_in_db = not self.database_manager.has_active_urls()
+        return (is_max_depth_reached and is_queue_empty) or (is_queue_empty and no_active_in_db)
 
     def queue_task_done(self) -> None:
         self.url_frontier.queue.task_done()

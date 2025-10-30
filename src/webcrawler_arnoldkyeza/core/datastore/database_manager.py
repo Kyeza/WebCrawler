@@ -4,7 +4,7 @@ import sqlite3
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, Optional, Dict, List
 
 from webcrawler_arnoldkyeza.core.datastore.schemas import create_tables
 from webcrawler_arnoldkyeza.core.enums.url_status_type import UrlStatusType
@@ -154,4 +154,46 @@ class DatabaseManager:
                 """,
                 (UrlStatusType.FAILED.value, error_message, normalized_url),
             )
+
+    def get_crawled_urls_with_extracted(self) -> Dict[str, List[str]]:
+        result: Dict[str, List[str]] = {}
+        with self._connect() as conn:
+            parent_cur = conn.execute(
+                """
+                SELECT url_id, normalized_url
+                FROM urls
+                WHERE status = ?
+                ORDER BY created_at
+                """,
+                (UrlStatusType.COMPLETED.value,)
+            )
+            parents = parent_cur.fetchall()
+            for parent in parents:
+                parent_id = parent["url_id"]
+                parent_norm = parent["normalized_url"]
+                child_cur = conn.execute(
+                    """
+                    SELECT normalized_url
+                    FROM urls
+                    WHERE parent_url_id = ?
+                    ORDER BY created_at
+                    """,
+                    (parent_id,)
+                )
+                children_rows = child_cur.fetchall()
+                result[parent_norm] = [row["normalized_url"] for row in children_rows]
+        return result
+
+    def has_active_urls(self) -> bool:
+        with self._connect() as conn:
+            cur = conn.execute(
+                """
+                SELECT COUNT(1) AS cnt
+                FROM urls
+                WHERE status IN (?, ?)
+                """,
+                (UrlStatusType.PENDING.value, UrlStatusType.IN_PROGRESS.value),
+            )
+            row = cur.fetchone()
+            return bool(row and row.get("cnt", 0) > 0)
 
