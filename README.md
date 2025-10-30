@@ -16,25 +16,41 @@ It is limited to a single subdomain. For example, starting at https://monzo.com/
 You can run the project directly from source.
 
 Option A: with a virtual environment
-```
+
+### On Linux/macOS
+```bash
 python -m venv .venv
-source .venv/bin/activate  
-# Windows: .venv\\Scripts\\activate
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### On Windows
+```bash
+python.exe -m venv .venv
+.venv\Scripts\activate
+python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 Option B: install as a package (editable)
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+# Create a virtual environment as described above and activate it, then;
 pip install -e .
 ```
 
 
 ## Usage
 Run the crawler as a module:
+
+### On Linux/macOS
 ```bash
-python -m webcrawler_arnoldkyeza.webcrawler https://example.com
+PYTHONPATH=src python -m webcrawler_arnoldkyeza.webcrawler "https://monzo.com" --max-depth 5
+```
+
+### On Windows
+```bash
+$env:PYTHONPATH="src"; python -m webcrawler_arnoldkyeza.webcrawler "https://monzo.com" --max-depth 5
 ```
 
 CLI options:
