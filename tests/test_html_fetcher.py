@@ -9,7 +9,7 @@ from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.http_handler imp
 from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.protocol_handler import (
     ProtocolHandler,
 )
-from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.errrors import (
+from webcrawler_arnoldkyeza.core.html_fetcher.protocol_handlers.errors import (
     UnsupportedContentTypeError,
 )
 
